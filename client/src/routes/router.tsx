@@ -15,7 +15,11 @@ const router = createBrowserRouter([
         element: <Board />,
       },
       {
-        path: "/ns/:id",
+        path: "/nsb/:id",
+        element: <Board />,
+      },
+      {
+        path: "ns/:id",
         element: <Notes />,
       },
     ],

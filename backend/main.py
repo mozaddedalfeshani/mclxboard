@@ -38,7 +38,7 @@ async def share(board_data: BoardDataType):
     result = notes_collection.insert_one(board_data.model_dump())  # Use dict() to convert to a dictionary
 
     # Return the URL with the inserted ID
-    return f"http://localhost:5173/ns/{str(result.inserted_id)}"  # Convert inserted_id to string
+    return f"{str(result.inserted_id)}"  # Convert inserted_id to string
 
 @app.get("/notesInfo/{id}")
 async def notes_info(id: str):
