@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from pymongo import MongoClient
 from fastapi.middleware.cors import CORSMiddleware
@@ -11,6 +11,14 @@ DATABASE_NAME = "home"
 
 # Initialize FastAPI app
 app = FastAPI()
+# Configure CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allow all origins (use specific origins in production for security)
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all HTTP methods
+    allow_headers=["*"],  # Allow all headers
+)
 
 # MongoDB Client Setup
 client = MongoClient(MONGO_URI)
@@ -18,15 +26,6 @@ db = client[DATABASE_NAME]
 users_collection = db["users"]
 noteDb = client['notes']
 notes_collection = noteDb["note"]
-
-# Configure CORS
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # Allow only the frontend's origin
-    allow_credentials=True,
-    allow_methods=["*"],  # Allow all HTTP methods
-    allow_headers=["*"],  # Allow all headers
-)
 
 # Pydantic models for request validation
 class BoardDataType(BaseModel):
@@ -40,15 +39,6 @@ async def share(board_data: BoardDataType):
 
     # Return the URL with the inserted ID
     return f"http://localhost:5173/ns/{str(result.inserted_id)}"  # Convert inserted_id to string
-
-from fastapi import FastAPI, HTTPException
-from bson import ObjectId
-from bson.errors import InvalidId
-
-# Assuming notes_collection is your MongoDB collection object
-# and app is your FastAPI application instance.
-
-app = FastAPI()
 
 @app.get("/notesInfo/{id}")
 async def notes_info(id: str):

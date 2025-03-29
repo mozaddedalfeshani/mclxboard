@@ -4,7 +4,7 @@ import { useParams } from "react-router";
 
 export default function Notes() {
   const id = useParams()?.id;
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<{ data: string } | null>(null);
   console.log(id);
   useEffect(() => {
     const fetchData = async () => {
@@ -16,5 +16,11 @@ export default function Notes() {
     fetchData();
   }, [id]);
 
-  return <div className="min-h-screen">{"THIS is page"}</div>;
+  return (
+    <div className="min-h-screen">
+      {"THIS is page"}
+      {/* Render API response as HTML */}
+      <div dangerouslySetInnerHTML={{ __html: data?.data || "" }} />
+    </div>
+  );
 }
