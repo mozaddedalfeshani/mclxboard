@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./client/public/mclx500.png" alt="Project Icon">
+  <img src="./client/public/mclx500.png" alt="Project Icon" height="400">
 </p>
 
 <p align="center">
