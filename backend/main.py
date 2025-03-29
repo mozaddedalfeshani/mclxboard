@@ -1,8 +1,9 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
-from motor.motor_asyncio import AsyncIOMotorClient
+from pymongo import MongoClient
 from fastapi.middleware.cors import CORSMiddleware
-from bson import ObjectId  # Import ObjectId
+from bson import ObjectId
+from bson.errors import InvalidId
 
 # Constants for configuration
 MONGO_URI = "mongodb://localhost:27017"
@@ -12,10 +13,11 @@ DATABASE_NAME = "home"
 app = FastAPI()
 
 # MongoDB Client Setup
-client = AsyncIOMotorClient(MONGO_URI)
+client = MongoClient(MONGO_URI)
 db = client[DATABASE_NAME]
 users_collection = db["users"]
-notes_collection = db["notes"]
+noteDb = client['notes']
+notes_collection = noteDb["note"]
 
 # Configure CORS
 app.add_middleware(
@@ -27,39 +29,39 @@ app.add_middleware(
 )
 
 # Pydantic models for request validation
-
-
-
 class BoardDataType(BaseModel):
-    fullData: str
+    data: str
     date: str
-
-class idType(BaseModel):
-    id:str
 
 @app.post("/share")
 async def share(board_data: BoardDataType):
-    # Insert board data into MongoDB collection
-    result = await notes_collection.insert_one(board_data.dict())
-    return {"Message": f"http://localhost:5173/ns/{result.inserted_id}"}
+    # Insert the board data into the MongoDB collection
+    result = notes_collection.insert_one(board_data.dict())  # Use dict() to convert to a dictionary
 
-
+    # Return the URL with the inserted ID
+    return {"Message": f"http://localhost:5173/ns/{str(result.inserted_id)}"}  # Convert inserted_id to string
 
 @app.get("/notesInfo/{id}")
 async def notes_info(id: str):
-    # Query to find the document by _id
-    query = {"_id": ObjectId(id)}
-    print(query)
-    # Perform the query
-    res = await notes_collection.find_one(query)
-    print(res)
+    try:
+        # Convert id to ObjectId
+        query = {"_id": ObjectId(id)}
+    except InvalidId:
+        return {"message": "Invalid ID format. Please provide a valid ObjectId."}  # Handle invalid ObjectId format
+
+    try:
+        # Perform the query in MongoDB
+        res = notes_collection.find_one(query)
+
+    except Exception as e:
+        # Catch any other database-related errors and log them
+        return {"message": f"Error fetching data: {str(e)}"}
 
     if res:
+        res["_id"] = str(res["_id"])
         return {"id": id, "data": res}  # Return data if found
     else:
         return {"message": "Note not found"}  # Return message if not found
-
-
 
 @app.get("/")
 def home():

@@ -16,5 +16,5 @@ export default function Notes() {
     fetchData();
   }, [id]);
 
-  return <div>{data}</div>;
+  return <div className="min-h-screen">{"THIS is page"}</div>;
 }
