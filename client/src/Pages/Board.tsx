@@ -4,24 +4,26 @@ import axios from "axios";
 
 function Board() {
   const [value, setValue] = useState("");
+  const [linkurl, setLinkUrl] = useState("");
   console.log(value);
 
   // data send to backend http://localhost:8000/share
   const handleShare = async () => {
     await axios
       .post("http://localhost:8000/share", {
-        fullData: value,
+        data: value, // Changed from fullData to data
         date: "none",
       })
       .then((res) => {
         console.log(res.data);
+        setLinkUrl(res.data); // Set the link URL from the response
       });
   };
 
   return (
     <div className="min-h-screen ">
       <div className="flex justify-center items-center mt-4 w-full">
-        {value}
+        {linkurl && linkurl}
       </div>
       <RichTextEditor value={value} onChange={setValue} bg={"#F1EFEC"} />
       <div className="flex justify-center items-center mt-4">

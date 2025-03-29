@@ -11,6 +11,7 @@ const NavBar = () => {
         alt="logo"
         className="w-[60px] "
       />
+
       {/* nav links */}
       <ul className="items-center gap-[20px] text-[1rem] text-[#424242] md:flex hidden">
         {/* Removed "home", "about us", "services", and their submenus */}

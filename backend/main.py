@@ -36,10 +36,10 @@ class BoardDataType(BaseModel):
 @app.post("/share")
 async def share(board_data: BoardDataType):
     # Insert the board data into the MongoDB collection
-    result = notes_collection.insert_one(board_data.dict())  # Use dict() to convert to a dictionary
+    result = notes_collection.insert_one(board_data.model_dump())  # Use dict() to convert to a dictionary
 
     # Return the URL with the inserted ID
-    return {"Message": f"http://localhost:5173/ns/{str(result.inserted_id)}"}  # Convert inserted_id to string
+    return f"http://localhost:5173/ns/{str(result.inserted_id)}"  # Convert inserted_id to string
 
 @app.get("/notesInfo/{id}")
 async def notes_info(id: str):
