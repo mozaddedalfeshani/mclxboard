@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://i.ibb.co.com/7xS3FxCW/mclx-500.png" alt="Project Icon">
+  <img src="./client/public/mclx500.png" alt="Project Icon">
 </p>
 
 <p align="center">
