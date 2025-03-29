@@ -12,6 +12,10 @@ function Board() {
   const [loading, setLoading] = useState(true);
   console.log(id);
   useEffect(() => {
+    // help to clean up database
+    const cleanUp = async () => {
+      await axios.delete(`http://localhost:8000/checkanddeletepast`);
+    };
     if (id) {
       setLoading(true);
       const fetchData = async () => {
@@ -26,6 +30,7 @@ function Board() {
       console.log("no id found");
       setLoading(false);
     }
+    cleanUp();
   }, [id]);
 
   // data send to backend http://localhost:8000/share

@@ -4,6 +4,7 @@ from pymongo import MongoClient
 from fastapi.middleware.cors import CORSMiddleware
 from bson import ObjectId
 from bson.errors import InvalidId
+from datetime import datetime, timedelta
 
 # Constants for configuration
 MONGO_URI = "mongodb://localhost:27017"
@@ -34,11 +35,18 @@ class BoardDataType(BaseModel):
 
 @app.post("/share")
 async def share(board_data: BoardDataType):
-    # Insert the board data into the MongoDB collection
-    result = notes_collection.insert_one(board_data.model_dump())  # Use dict() to convert to a dictionary
+    # expire_after_seconds = 2 * 24 * 60 * 60  # 2 days
+    expire_after_seconds = 30  # 2 days
+    expire_at = datetime.utcnow() + timedelta(seconds=expire_after_seconds)
 
-    # Return the URL with the inserted ID
-    return f"{str(result.inserted_id)}"  # Convert inserted_id to string
+    board_data_with_expiry = board_data.model_dump()
+    board_data_with_expiry["expireAt"] = expire_at  # Ensure it's a datetime object
+
+    print(f"Document before insertion: {board_data_with_expiry}")
+
+    result = notes_collection.insert_one(board_data_with_expiry)
+
+    return {"inserted_id": str(result.inserted_id)}
 
 @app.get("/notesInfo/{id}")
 async def notes_info(id: str):
@@ -60,6 +68,20 @@ async def notes_info(id: str):
         return {"data": res.get("data")}  # Return only the "data" field
     else:
         raise HTTPException(status_code=404, detail="Note not found")
+    
+@app.get("/checkanddeletepast")
+async def check_and_delete_past():
+    """
+    Checks the 'note' collection for documents where 'expireAt' is in the past
+    and deletes them.
+    """
+    now = datetime.utcnow()
+    print(f"Current UTC time: {now}") #Add this line.
+    query = {"expireAt": {"$lt": now}}
+    print(f"Delete query: {query}") #Add this line.
+    result = notes_collection.delete_many(query)
+    print(f"Deleted count: {result.deleted_count}") #Add this line.
+    return {"deleted_count": result.deleted_count}
 
 @app.get("/")
 def home():
