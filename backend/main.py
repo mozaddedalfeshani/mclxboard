@@ -41,13 +41,22 @@ async def share(board_data: BoardDataType):
     # Return the URL with the inserted ID
     return f"http://localhost:5173/ns/{str(result.inserted_id)}"  # Convert inserted_id to string
 
+from fastapi import FastAPI, HTTPException
+from bson import ObjectId
+from bson.errors import InvalidId
+
+# Assuming notes_collection is your MongoDB collection object
+# and app is your FastAPI application instance.
+
+app = FastAPI()
+
 @app.get("/notesInfo/{id}")
 async def notes_info(id: str):
     try:
         # Convert id to ObjectId
         query = {"_id": ObjectId(id)}
     except InvalidId:
-        return {"message": "Invalid ID format. Please provide a valid ObjectId."}  # Handle invalid ObjectId format
+        raise HTTPException(status_code=400, detail="Invalid ID format. Please provide a valid ObjectId.")
 
     try:
         # Perform the query in MongoDB
@@ -55,13 +64,12 @@ async def notes_info(id: str):
 
     except Exception as e:
         # Catch any other database-related errors and log them
-        return {"message": f"Error fetching data: {str(e)}"}
+        raise HTTPException(status_code=500, detail=f"Error fetching data: {str(e)}")
 
     if res:
-        res["_id"] = str(res["_id"])
-        return {"id": id, "data": res}  # Return data if found
+        return {"data": res.get("data")}  # Return only the "data" field
     else:
-        return {"message": "Note not found"}  # Return message if not found
+        raise HTTPException(status_code=404, detail="Note not found")
 
 @app.get("/")
 def home():
