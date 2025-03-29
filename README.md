@@ -1,3 +1,11 @@
+<p align="center">
+  <img src="https://i.ibb.co.com/7xS3FxCW/mclx-500.png" alt="Project Icon">
+</p>
+
+<p align="center">
+  <strong>MCLX (Muradian Community for Logic Exchange)</strong>
+</p>
+
 # Notes Application
 
 This project is a simple "Notes" application built with React, TypeScript, and Vite. It allows users to register, log in, and create/view notes. The application showcases authentication and basic CRUD (Create, Read, Update, Delete) operations.
@@ -81,3 +89,7 @@ export default tseslint.config({
 ## License
 
 This project is licensed under the MIT License.
+
+## Open Source
+
+This project is fully open source, and contributions are welcome. Feel free to fork the repository and submit pull requests!
